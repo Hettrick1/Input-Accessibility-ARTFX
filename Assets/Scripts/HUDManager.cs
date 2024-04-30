@@ -6,6 +6,7 @@ public class HUDManager : MonoBehaviour
 {
     public static HUDManager instance;
     [SerializeField] private Button[] menuBtns;
+    [SerializeField] private GameObject[] menuSlots;
     [SerializeField] private InputActionReference menuRight;
     [SerializeField] private InputActionReference menuLeft;
 
@@ -33,11 +34,19 @@ public class HUDManager : MonoBehaviour
         {
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
-            menuBtns[index].Select();
+            ColorBlock cb = menuBtns[index].colors;
+            cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
+            menuBtns[index].colors = cb;
+            menuSlots[index].SetActive(true);
+            menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
             PlayerMovement.instance.SetIsPaused(true);
         }
         else
         {
+            ColorBlock cb = menuBtns[index].colors;
+            cb.normalColor = Color.white;
+            menuBtns[index].colors = cb;
+            menuSlots[index].SetActive(false);
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             PlayerMovement.instance.SetIsPaused(false);
@@ -56,6 +65,10 @@ public class HUDManager : MonoBehaviour
     }
     private void ChangeMenu(int menu)
     {
+        ColorBlock cb = menuBtns[index].colors;
+        cb.normalColor = Color.white;
+        menuBtns[index].colors = cb;
+        menuSlots[index].SetActive(false);
         if (index == 0 && menu < 0)
         {
             index = 2;
@@ -68,8 +81,24 @@ public class HUDManager : MonoBehaviour
         {
             index += menu;
         }
-        print(index);
-        menuBtns[index].Select();
+        menuSlots[index].SetActive(true);
+        cb = menuBtns[index].colors;
+        cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
+        menuBtns[index].colors = cb;
+        menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+    }
+    public void ChangeMenuSlot(int menu)
+    {
+        menuSlots[index].SetActive(false);
+        ColorBlock cb = menuBtns[index].colors;
+        cb.normalColor = Color.white;
+        menuBtns[index].colors = cb;
+        index = menu;
+        menuSlots[index].SetActive(true);
+        cb = menuBtns[index].colors;
+        cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
+        menuBtns[index].colors = cb;
+        menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
     }
 
     private void test()
