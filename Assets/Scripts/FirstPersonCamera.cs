@@ -25,11 +25,14 @@ public class FirstPersonCamera : MonoBehaviour
 
     void Update()
     {
-        cameraVerticalRotation -= input.y;
-        cameraVerticalRotation = Mathf.Clamp(cameraVerticalRotation, -90, 90);
-        transform.localEulerAngles = Vector3.right * cameraVerticalRotation;
+        if (!PlayerMovement.instance.GetIsPaused())
+        {
+            cameraVerticalRotation -= input.y;
+            cameraVerticalRotation = Mathf.Clamp(cameraVerticalRotation, -90, 90);
+            transform.localEulerAngles = Vector3.right * cameraVerticalRotation;
 
-        player.Rotate(Vector3.up * input.x);
+            player.Rotate(Vector3.up * input.x);
+        }
     }
 
     public void mousePosition(InputAction.CallbackContext context)
