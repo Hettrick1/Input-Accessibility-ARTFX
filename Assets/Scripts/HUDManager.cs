@@ -8,15 +8,36 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private Button[] menuBtns;
     [SerializeField] private GameObject[] menuSlots;
     [SerializeField] private GameObject[] settingsMenuSlots;
+    [SerializeField] private Toggle fullscreenToggle, vSyncToggle;
     [SerializeField] private InputActionReference menuRight;
     [SerializeField] private InputActionReference menuLeft;
 
     int index = 0;
     int settingIndex = 0;
 
+    int isFullScreenActivated, isVSyncActivated;
+
     private void Start()
     {
         instance = this;
+        isFullScreenActivated = PlayerPrefs.GetInt("fullscreen", 1);
+        if (isFullScreenActivated == 1)
+        {
+            fullscreenToggle.isOn = true;
+        }
+        else if (isFullScreenActivated == 0)
+        {
+            fullscreenToggle.isOn = false;
+        }
+        isVSyncActivated = PlayerPrefs.GetInt("vsync", 1);
+        if (isVSyncActivated == 1)
+        {
+            vSyncToggle.isOn = true;
+        }
+        else if (isVSyncActivated == 0)
+        {
+            vSyncToggle.isOn = false;
+        }
     }
     private void OnEnable()
     {
@@ -28,6 +49,8 @@ public class HUDManager : MonoBehaviour
     {
         menuLeft.action.performed -= ChangeMenuLeft;
         menuRight.action.performed -= ChangeMenuRight;
+        PlayerPrefs.SetInt("fullscreen", isFullScreenActivated);
+        PlayerPrefs.SetInt("vsync", isVSyncActivated);
     }
     public void SetPause()
     {
@@ -110,6 +133,34 @@ public class HUDManager : MonoBehaviour
         settingsMenuSlots[settingIndex].SetActive(false);
         settingIndex = settings;
         settingsMenuSlots[settingIndex].SetActive(true);
+    }
+    public void setFullscreen()
+    {
+        if (fullscreenToggle.isOn)
+        {
+            Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+            isFullScreenActivated = 1;
+        }
+
+        else
+        {
+            Screen.fullScreenMode = FullScreenMode.Windowed;
+            isFullScreenActivated = 0;
+        }
+    }
+    public void setVsync()
+    {
+        if (vSyncToggle.isOn)
+        {
+            QualitySettings.vSyncCount = 1;
+            isFullScreenActivated = 1;
+        }
+
+        else
+        {
+            QualitySettings.vSyncCount = 0;
+            isFullScreenActivated = 0;
+        }
     }
 
 }
