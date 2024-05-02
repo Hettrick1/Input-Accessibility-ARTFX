@@ -7,10 +7,12 @@ public class HUDManager : MonoBehaviour
     public static HUDManager instance;
     [SerializeField] private Button[] menuBtns;
     [SerializeField] private GameObject[] menuSlots;
+    [SerializeField] private GameObject[] settingsMenuSlots;
     [SerializeField] private InputActionReference menuRight;
     [SerializeField] private InputActionReference menuLeft;
 
     int index = 0;
+    int settingIndex = 0;
 
     private void Start()
     {
@@ -55,12 +57,10 @@ public class HUDManager : MonoBehaviour
 
     private void ChangeMenuLeft(InputAction.CallbackContext obj)
     {
-        print("test");
         ChangeMenu(-1);
     }
     private void ChangeMenuRight(InputAction.CallbackContext obj)
     {
-        print("test");
         ChangeMenu(1);
     }
     private void ChangeMenu(int menu)
@@ -82,6 +82,11 @@ public class HUDManager : MonoBehaviour
             index += menu;
         }
         menuSlots[index].SetActive(true);
+        if(index == 1)
+        {
+            settingsMenuSlots[0].SetActive(true);
+            settingsMenuSlots[0].GetComponent<SelectSlider>().SelectFirstBtn();
+        }
         cb = menuBtns[index].colors;
         cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
         menuBtns[index].colors = cb;
@@ -100,9 +105,11 @@ public class HUDManager : MonoBehaviour
         menuBtns[index].colors = cb;
         menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
     }
-
-    private void test()
+    public void ChangeSettingsSlots(int settings)
     {
-        print("qfpkig");
+        settingsMenuSlots[settingIndex].SetActive(false);
+        settingIndex = settings;
+        settingsMenuSlots[settingIndex].SetActive(true);
     }
+
 }
