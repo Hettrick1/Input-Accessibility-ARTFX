@@ -26,10 +26,6 @@ public class PlayerMovement : MonoBehaviour
     {
         isPaused = !canMove;
     }
-    public bool GetPause()
-    {
-        return isPaused;
-    }
     private void Start()
     {
         instance = this;

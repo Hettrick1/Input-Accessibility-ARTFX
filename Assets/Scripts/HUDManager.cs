@@ -1,4 +1,6 @@
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
@@ -11,6 +13,7 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private Toggle fullscreenToggle, vSyncToggle;
     [SerializeField] private InputActionReference menuRight;
     [SerializeField] private InputActionReference menuLeft;
+    [SerializeField] private InputActionReference returnBack;
 
     int index = 0;
     int settingIndex = 0;
@@ -43,48 +46,80 @@ public class HUDManager : MonoBehaviour
     {
         menuLeft.action.performed += ChangeMenuLeft;
         menuRight.action.performed += ChangeMenuRight;
+        returnBack.action.performed += ReturnBack;
+        InputSystem.onDeviceChange += OnDeviceChange;
     }
 
     private void OnDisable()
     {
         menuLeft.action.performed -= ChangeMenuLeft;
         menuRight.action.performed -= ChangeMenuRight;
+        returnBack.action.performed -= ReturnBack;
+        InputSystem.onDeviceChange -= OnDeviceChange;
         PlayerPrefs.SetInt("fullscreen", isFullScreenActivated);
         PlayerPrefs.SetInt("vsync", isVSyncActivated);
     }
-    public void SetPause()
+    public void SetPause(InputAction.CallbackContext context)
     {
-        index = 0;
-        if (PlayerMovement.instance.GetIsPaused() == false)
+        if (context.performed && PlayerMovement.instance.GetIsPaused() == false)
         {
+            index = 0;
+            transform.GetChild(0).gameObject.SetActive(true);
             Cursor.visible = true;
             Cursor.lockState = CursorLockMode.None;
             ColorBlock cb = menuBtns[index].colors;
             cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
             menuBtns[index].colors = cb;
             menuSlots[index].SetActive(true);
-            menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+            if(Gamepad.current != null)
+            {
+                menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+            }
             PlayerMovement.instance.SetIsPaused(true);
         }
-        else
+        else if (context.performed && PlayerMovement.instance.GetIsPaused() == true)
         {
+            transform.GetChild(0).gameObject.SetActive(false);
             ColorBlock cb = menuBtns[index].colors;
             cb.normalColor = Color.white;
-            menuBtns[index].colors = cb;
-            menuSlots[index].SetActive(false);
+            foreach (Button btn in menuBtns)
+            {
+                btn.colors = cb;
+            } 
+            foreach (GameObject menu in menuSlots)
+            {
+                menu.SetActive(false);
+            }
             Cursor.visible = false;
             Cursor.lockState = CursorLockMode.Locked;
             PlayerMovement.instance.SetIsPaused(false);
         }
     }
 
+    private void ReturnBack(InputAction.CallbackContext obj)
+    {
+        if(PlayerMovement.instance.GetIsPaused() == true)
+        {
+            if (index == 1 && Gamepad.current != null)
+            {
+                menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+            }
+        }
+    }
+
     private void ChangeMenuLeft(InputAction.CallbackContext obj)
     {
-        ChangeMenu(-1);
+        if (PlayerMovement.instance.GetIsPaused() == true)
+        {
+            ChangeMenu(-1);
+        }
     }
     private void ChangeMenuRight(InputAction.CallbackContext obj)
     {
-        ChangeMenu(1);
+        if (PlayerMovement.instance.GetIsPaused() == true)
+        {
+            ChangeMenu(1);
+        }
     }
     private void ChangeMenu(int menu)
     {
@@ -108,12 +143,18 @@ public class HUDManager : MonoBehaviour
         if(index == 1)
         {
             settingsMenuSlots[0].SetActive(true);
-            settingsMenuSlots[0].GetComponent<SelectSlider>().SelectFirstBtn();
+            if(Gamepad.current != null)
+            {
+                settingsMenuSlots[0].GetComponent<SelectSlider>().SelectFirstBtn();
+            }
         }
         cb = menuBtns[index].colors;
         cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
         menuBtns[index].colors = cb;
-        menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+        if (Gamepad.current != null)
+        {
+            menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+        }
     }
     public void ChangeMenuSlot(int menu)
     {
@@ -126,7 +167,10 @@ public class HUDManager : MonoBehaviour
         cb = menuBtns[index].colors;
         cb.normalColor = new Color(0.6352941f, 0.6352941f, 0.6352941f, 1);
         menuBtns[index].colors = cb;
-        menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+        if(Gamepad.current != null)
+        {
+            menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+        }
     }
     public void ChangeSettingsSlots(int settings)
     {
@@ -160,6 +204,19 @@ public class HUDManager : MonoBehaviour
         {
             QualitySettings.vSyncCount = 0;
             isFullScreenActivated = 0;
+        }
+    }
+    void OnDeviceChange(InputDevice device, InputDeviceChange change)
+    {
+        {
+            if (change == InputDeviceChange.Added && Gamepad.current != null)
+            {
+                menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+            }
+            else if (change == InputDeviceChange.Removed && Gamepad.current == null)
+            {
+                EventSystem.current.SetSelectedGameObject(null);
+            }
         }
     }
 
