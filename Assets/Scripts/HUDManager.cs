@@ -76,6 +76,8 @@ public class HUDManager : MonoBehaviour
             if(Gamepad.current != null)
             {
                 menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+                inputImages[5].SetActive(true);
+                inputImages[4].SetActive(true);
                 inputImages[3].SetActive(true);
                 inputImages[2].SetActive(true);
                 inputImages[1].SetActive(false);
@@ -87,6 +89,8 @@ public class HUDManager : MonoBehaviour
                 inputImages[1].SetActive(true);
                 inputImages[2].SetActive(false);
                 inputImages[3].SetActive(false);
+                inputImages[4].SetActive(false);
+                inputImages[5].SetActive(false);
             }
             PlayerMovement.instance.SetIsPaused(true);
         }
@@ -240,6 +244,8 @@ public class HUDManager : MonoBehaviour
             if (change == InputDeviceChange.Added && Gamepad.current != null)
             {
                 menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+                inputImages[5].SetActive(true);
+                inputImages[4].SetActive(true);
                 inputImages[3].SetActive(true);
                 inputImages[2].SetActive(true);
                 inputImages[1].SetActive(false);
@@ -253,6 +259,8 @@ public class HUDManager : MonoBehaviour
                 inputImages[1].SetActive(true);
                 inputImages[2].SetActive(false);
                 inputImages[3].SetActive(false);
+                inputImages[4].SetActive(false);
+                inputImages[5].SetActive(false);
             }
         }
     }
