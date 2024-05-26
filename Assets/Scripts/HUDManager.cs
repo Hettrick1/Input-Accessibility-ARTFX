@@ -8,6 +8,8 @@ public class HUDManager : MonoBehaviour
 {
     public static HUDManager instance;
     [SerializeField] private Button[] menuBtns;
+    [SerializeField] private GameObject[] inputImages;
+
     [SerializeField] private GameObject[] menuSlots;
     [SerializeField] private GameObject[] settingsMenuSlots;
     [SerializeField] private Toggle fullscreenToggle, vSyncToggle;
@@ -74,6 +76,17 @@ public class HUDManager : MonoBehaviour
             if(Gamepad.current != null)
             {
                 menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+                inputImages[3].SetActive(true);
+                inputImages[2].SetActive(true);
+                inputImages[1].SetActive(false);
+                inputImages[0].SetActive(false);
+            }
+            else
+            {
+                inputImages[0].SetActive(true);
+                inputImages[1].SetActive(true);
+                inputImages[2].SetActive(false);
+                inputImages[3].SetActive(false);
             }
             PlayerMovement.instance.SetIsPaused(true);
         }
@@ -175,7 +188,14 @@ public class HUDManager : MonoBehaviour
     public void ChangeSettingsSlots(int settings)
     {
         settingsMenuSlots[settingIndex].SetActive(false);
-        settingIndex = settings;
+        if(Gamepad.current != null && settings == 2)
+        {
+            settingIndex = 3;
+        }
+        else
+        {
+            settingIndex = settings;
+        }
         settingsMenuSlots[settingIndex].SetActive(true);
     }
     public void setFullscreen()
@@ -209,13 +229,30 @@ public class HUDManager : MonoBehaviour
     void OnDeviceChange(InputDevice device, InputDeviceChange change)
     {
         {
+            if (menuSlots[1].activeSelf)
+            {
+                foreach(GameObject sms in settingsMenuSlots)
+                {
+                    sms.SetActive(false);
+                }
+                settingsMenuSlots[0].SetActive(true);
+            }
             if (change == InputDeviceChange.Added && Gamepad.current != null)
             {
                 menuSlots[index].GetComponent<SelectButton>().SelectFirstBtn();
+                inputImages[3].SetActive(true);
+                inputImages[2].SetActive(true);
+                inputImages[1].SetActive(false);
+                inputImages[0].SetActive(false);
+
             }
             else if (change == InputDeviceChange.Removed && Gamepad.current == null)
             {
                 EventSystem.current.SetSelectedGameObject(null);
+                inputImages[0].SetActive(true);
+                inputImages[1].SetActive(true);
+                inputImages[2].SetActive(false);
+                inputImages[3].SetActive(false);
             }
         }
     }
